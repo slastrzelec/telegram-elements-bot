@@ -1,0 +1,53 @@
+name: publish-element
+
+on:
+  schedule:
+    # 06:00 i 07:00 UTC: jedno z nich to 8:00 w Warszawie (lato/zima).
+    # Bramka czasu w kodzie pilnuje, by opublikować tylko raz dziennie.
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Tylko wygeneruj artykuł, nie publikuj i nie zapisuj stanu"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-element
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          OWNER_CHAT_ID: ${{ secrets.OWNER_CHAT_ID }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python -m elementbot
+
+      - name: Save state
+        if: always() && github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "elements-bot"
+          git config user.email "elements-bot@users.noreply.github.com"
+          git add data/published.json
+          git diff --cached --quiet || (git commit -m "Update published state" && git push)
