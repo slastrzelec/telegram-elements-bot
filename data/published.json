@@ -1,11 +1,59 @@
 {
   "published": [
-    {"z": 13, "symbol": "Al", "date": null, "message_id": null, "seeded": true},
-    {"z": 15, "symbol": "P", "date": null, "message_id": null, "seeded": true},
-    {"z": 29, "symbol": "Cu", "date": null, "message_id": null, "seeded": true},
-    {"z": 33, "symbol": "As", "date": null, "message_id": null, "seeded": true},
-    {"z": 34, "symbol": "Se", "date": null, "message_id": null, "seeded": true},
-    {"z": 80, "symbol": "Hg", "date": null, "message_id": null, "seeded": true},
-    {"z": 83, "symbol": "Bi", "date": null, "message_id": null, "seeded": true}
+    {
+      "z": 13,
+      "symbol": "Al",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 15,
+      "symbol": "P",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 29,
+      "symbol": "Cu",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 33,
+      "symbol": "As",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 34,
+      "symbol": "Se",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 80,
+      "symbol": "Hg",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 83,
+      "symbol": "Bi",
+      "date": null,
+      "message_id": null,
+      "seeded": true
+    },
+    {
+      "z": 1,
+      "symbol": "H",
+      "date": "2026-10-19",
+      "message_id": 3600
+    }
   ]
 }
