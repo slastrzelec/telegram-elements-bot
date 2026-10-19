@@ -4,7 +4,7 @@ import pytest
 import requests
 
 from elementbot import state as st
-from elementbot.generate import GenerationError, extract_article, generate_article
+from elementbot.generate import ApiBackend, CliBackend, GenerationError, extract_article, generate_article
 from elementbot.main import run
 from elementbot.publish import PublishError, send_message
 from elementbot.elements import ELEMENTS
@@ -129,7 +129,7 @@ def resp(text, stop="end_turn"):
 
 def test_generate_two_passes_second_uses_web_search(good_article):
     client = FakeClient([resp(f"<artykul>{good_article}</artykul>"), resp(f"komentarz <artykul>{good_article}!</artykul>")])
-    out = generate_article(client, "m", ELEMENTS[25], [])
+    out = generate_article(ApiBackend(client, "m"), ELEMENTS[25], [])
     assert out.endswith("!")
     assert "tools" not in client.calls[0]
     assert client.calls[1]["tools"][0]["name"] == "web_search"
@@ -141,7 +141,7 @@ def test_generate_handles_pause_turn(good_article):
         resp("<artykul>", stop="pause_turn"),
         resp(f"{good_article}</artykul>"),
     ])
-    assert generate_article(client, "m", ELEMENTS[25], []) == good_article
+    assert generate_article(ApiBackend(client, "m"), ELEMENTS[25], []) == good_article
 
 
 def test_extract_requires_tags():
@@ -200,3 +200,51 @@ def test_send_message_returns_id_and_uses_plain_text(monkeypatch):
     monkeypatch.setattr(requests, "post", fake)
     assert send_message(TOKEN, "@kanal", "tekst") == 42
     assert "parse_mode" not in seen["json"]
+
+
+# --- backend CLI (subskrypcja) ---
+
+class FakeRunner:
+    def __init__(self, outputs, returncode=0, stderr="", exc=None):
+        self.outputs = list(outputs)
+        self.returncode, self.stderr, self.exc = returncode, stderr, exc
+        self.calls = []
+
+    def __call__(self, cmd, **kw):
+        self.calls.append((cmd, kw))
+        if self.exc:
+            raise self.exc
+        return SimpleNamespace(returncode=self.returncode, stdout=self.outputs.pop(0) if self.outputs else "", stderr=self.stderr)
+
+
+def test_cli_two_passes_search_only_in_second(good_article, monkeypatch):
+    monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "oauth-secret")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-should-be-stripped")
+    runner = FakeRunner([f"<artykul>{good_article}</artykul>", f"ok <artykul>{good_article}!</artykul>"])
+    out = generate_article(CliBackend(model="m", runner=runner), ELEMENTS[25], [])
+    assert out.endswith("!")
+    draft_cmd, verify_cmd = runner.calls[0][0], runner.calls[1][0]
+    assert "--allowedTools" not in draft_cmd and "WebSearch" in draft_cmd[draft_cmd.index("--disallowedTools") + 1]
+    assert verify_cmd[verify_cmd.index("--allowedTools") + 1] == "WebSearch"
+    for cmd, kw in runner.calls:
+        assert cmd[:2] == ["claude", "-p"] and "--model" in cmd
+        assert "ANTHROPIC_API_KEY" not in kw["env"]  # musi liczyć się subskrypcja, nie API
+        assert kw["env"]["CLAUDE_CODE_OAUTH_TOKEN"] == "oauth-secret"
+        assert "Bash" in cmd[cmd.index("--disallowedTools") + 1]
+
+
+def test_cli_nonzero_exit_raises_without_leaking_token(monkeypatch):
+    monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "oauth-secret")
+    runner = FakeRunner([], returncode=1, stderr="auth failed for oauth-secret, usage limit reached")
+    with pytest.raises(GenerationError) as exc:
+        CliBackend(runner=runner).complete("x", search=False)
+    assert "oauth-secret" not in str(exc.value) and "usage limit" in str(exc.value)
+
+
+def test_cli_timeout_and_missing_binary():
+    import subprocess
+
+    with pytest.raises(GenerationError):
+        CliBackend(runner=FakeRunner([], exc=subprocess.TimeoutExpired("claude", 1))).complete("x", search=True)
+    with pytest.raises(GenerationError):
+        CliBackend(runner=FakeRunner([], exc=FileNotFoundError())).complete("x", search=True)
