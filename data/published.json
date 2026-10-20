@@ -54,6 +54,12 @@
       "symbol": "H",
       "date": "2026-10-19",
       "message_id": 3600
+    },
+    {
+      "z": 2,
+      "symbol": "He",
+      "date": "2026-10-20",
+      "message_id": 3601
     }
   ]
 }
