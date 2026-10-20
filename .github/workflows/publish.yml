@@ -2,10 +2,9 @@ name: publish-element
 
 on:
   schedule:
-    # 06:00 i 07:00 UTC: jedno z nich to 8:00 w Warszawie (lato/zima).
+    # GitHub opóźnia i pomija uruchomienia harmonogramu, więc jest ich kilka dziennie.
     # Bramka czasu w kodzie pilnuje, by opublikować tylko raz dziennie.
-    - cron: "0 6 * * *"
-    - cron: "0 7 * * *"
+    - cron: "0 6,7,9,11,13,15,17 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

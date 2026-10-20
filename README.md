@@ -1,6 +1,6 @@
 # elementy-bot
 
-Bot publikujący codziennie o 8:00 (czas polski) artykuł popularnonaukowy o kolejnym pierwiastku na kanale Telegram. Pełna specyfikacja: [SPEC.md](SPEC.md).
+Bot publikujący codziennie (docelowo rano, w oknie 8:00-21:59 czasu polskiego) artykuł popularnonaukowy o kolejnym pierwiastku na kanale Telegram. Pełna specyfikacja: [SPEC.md](SPEC.md).
 
 ## Uruchomienie lokalne (bez publikacji)
 

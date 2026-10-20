@@ -62,7 +62,8 @@ def test_timegate_only_once_per_day():
     assert should_publish_now(utc(2026, 7, 2, 6, 5), data)  # następny dzień
 
 
-def test_timegate_window_closes_at_noon():
+def test_timegate_window_closes_at_22_local():
     data = {"published": []}
-    assert should_publish_now(utc(2026, 7, 1, 9, 59), data)  # 11:59 CEST
-    assert not should_publish_now(utc(2026, 7, 1, 10, 0), data)  # 12:00 CEST
+    assert should_publish_now(utc(2026, 7, 1, 12, 40), data)  # opóźniony cron, 14:40 CEST
+    assert should_publish_now(utc(2026, 7, 1, 19, 59), data)  # 21:59 CEST
+    assert not should_publish_now(utc(2026, 7, 1, 20, 0), data)  # 22:00 CEST

@@ -1,8 +1,9 @@
-"""Bramka czasu: publikuj od 8:00 do 11:59 czasu warszawskiego, raz dziennie.
+"""Bramka czasu: publikuj od 8:00 do 21:59 czasu warszawskiego, raz dziennie.
 
-Cron działa w UTC, więc workflow uruchamia się o 06:00 i 07:00 UTC. Latem
-pierwsze uruchomienie przypada na 8:00 lokalnie, zimą drugie. Drugie uruchomienie
-latem widzi wpis z dzisiejszą datą i kończy bez publikacji.
+Harmonogram GitHub Actions bywa opóźniany o wiele godzin albo pomija
+uruchomienia, więc workflow ma kilka wyzwalaczy w ciągu dnia (UTC), a bramka
+zapewnia jedną publikację na dobę: pierwsze uruchomienie w oknie publikuje,
+kolejne widzą wpis z dzisiejszą datą i kończą bez publikacji.
 """
 from __future__ import annotations
 
@@ -13,7 +14,7 @@ from .state import published_dates
 
 TZ = ZoneInfo("Europe/Warsaw")
 START_HOUR = 8
-END_HOUR = 12  # wyłącznie
+END_HOUR = 22  # wyłącznie
 
 
 def local_date(now: datetime) -> str:

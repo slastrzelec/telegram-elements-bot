@@ -1,14 +1,14 @@
 # Specyfikacja: bot kanału o pierwiastkach (v1)
 
 ## Cel
-Codziennie o 8:00 czasu polskiego bot publikuje na kanale Telegram jeden artykuł popularnonaukowy o kolejnym pierwiastku chemicznym, w ustalonym stylu, bez udziału człowieka.
+Codziennie, docelowo rano (od 8:00 czasu polskiego), bot publikuje na kanale Telegram jeden artykuł popularnonaukowy o kolejnym pierwiastku chemicznym, w ustalonym stylu, bez udziału człowieka.
 
 ## Zakres v1
 W zakresie: kolejka 118 pierwiastków, generowanie, weryfikacja faktów, walidacja formatu, publikacja, powiadomienie właściciela o błędzie, harmonogram.
 Poza zakresem: obrazki, panel, wiele kanałów, analiza zasięgów.
 
 ## Przepływ
-1. Bramka czasu: działanie tylko gdy w Warszawie jest godzina 8-11 i dziś jeszcze nic nie opublikowano.
+1. Bramka czasu: działanie tylko gdy w Warszawie jest godzina 8-21 i dziś jeszcze nic nie opublikowano.
 2. Kolejka: następny pierwiastek wg liczby atomowej, z pominięciem już opublikowanych (stan w `data/published.json`, zasiane: Al, P, Cu, As, Se, Hg, Bi).
 3. Szkic: model pisze artykuł wg promptu stylu. Backend do wyboru: `cli` (Claude Code w trybie bez interfejsu, token subskrypcji `CLAUDE_CODE_OAUTH_TOKEN`, domyślny gdy token jest ustawiony) albo `api` (klucz `ANTHROPIC_API_KEY`).
 4. Weryfikacja: drugie wywołanie z wyszukiwarką sieciową sprawdza daty, liczby, nazwiska; niepotwierdzone twierdzenia usuwa lub łagodzi.
@@ -34,7 +34,7 @@ Polski, jeden płynny tekst, tytuł z emoji, historia i odkrywca, budowa i wła�
 - Polecenia CLI (flagi, zachowanie trybu bez interfejsu) nie były testowane na żywo; pierwszy `dry_run` jest obowiązkowy.
 - Nazwa narzędzia wyszukiwarki w API i sposób rozliczania muszą zostać potwierdzone przy pierwszym prawdziwym uruchomieniu (testy używają atrap).
 - Harmonogram GitHub Actions może się opóźnić o kilkanaście minut.
-- Cron działa w UTC. Dwa wyzwalacze (06:00 i 07:00 UTC) + bramka czasu dają 8:00 latem i zimą.
+- Cron działa w UTC i GitHub w praktyce opóźnia go o godziny albo pomija uruchomienia (obserwowane w tym repo). Dlatego wyzwalaczy jest kilka w ciągu dnia (06, 07, 09, 11, 13, 15, 17 UTC), a bramka (okno 8:00-21:59 czasu polskiego, jeden post dziennie) wybiera pierwsze udane. Godzina publikacji nie jest gwarantowana. Przy trwałej awarii (np. wyczerpany limit) właściciel dostaje do kilku powiadomień dziennie, po jednym na każde uruchomienie.
 - Kolejka kończy się po 118 pierwiastkach; bot wyśle wtedy wiadomość do właściciela.
 
 ## Kryteria akceptacji
