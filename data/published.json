@@ -114,6 +114,12 @@
       "symbol": "Na",
       "date": "2026-10-31",
       "message_id": 3622
+    },
+    {
+      "z": 12,
+      "symbol": "Mg",
+      "date": "2026-11-01",
+      "message_id": 3623
     }
   ]
 }
