@@ -228,6 +228,12 @@
       "symbol": "Br",
       "date": "2026-11-21",
       "message_id": 3687
+    },
+    {
+      "z": 36,
+      "symbol": "Kr",
+      "date": "2026-11-22",
+      "message_id": 3688
     }
   ]
 }
