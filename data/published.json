@@ -264,6 +264,12 @@
       "symbol": "Nb",
       "date": "2026-11-27",
       "message_id": 3708
+    },
+    {
+      "z": 42,
+      "symbol": "Mo",
+      "date": "2026-11-28",
+      "message_id": 3711
     }
   ]
 }
